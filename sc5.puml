@@ -1,0 +1,33 @@
+@startuml
+actor DroneCommander
+participant "UI UAV Control" as UIUAVControl
+participant FlightManager
+actor UAV
+participant FlightZoneManager
+
+activate DroneCommander
+activate UAV
+
+DroneCommander -> UIUAVControl : 1: callHome()
+activate UIUAVControl
+UIUAVControl -> FlightManager : 1: raiseCompleteAlert()
+deactivate UIUAVControl
+activate FlightManager
+
+FlightManager -> UAV : 2: requestHomeCoord()
+UAV -> FlightManager : 2: confirmHomeCoord()
+FlightManager -> UAV : 2: checkUniqueHome()
+deactivate FlightManager
+
+UAV -> UAV : 3: planHomeFlight()
+
+loop 6: isHome()
+  UAV -> FlightZoneManager : 4: leaseAirspace()
+  activate FlightZoneManager
+  FlightZoneManager -> UAV : 5: sendClearance()
+  deactivate FlightZoneManager
+  UAV -> UAV : 5: flyToTarget()
+end
+
+UAV -> UAV : 6: lands()
+@enduml

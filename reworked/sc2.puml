@@ -1,0 +1,22 @@
+@startuml
+title SC2 – Active Tracking
+
+actor MissionCommander
+participant UAV
+participant "UAV Onboard Tracker" as Tracker
+
+UAV -> UAV : 1: flyToWaypoint(trackingPosition)
+
+loop 6: until stopTracking() is received
+  ref over UAV : 2: SC8 Image Capture and Analysis\n(continually tag the victim)
+
+  UAV -> Tracker : trackVictim()
+  activate Tracker
+  Tracker -> Tracker : 3: calculateVictimPosition()
+  Tracker -> Tracker : 4: calculateVelocityVector()
+  Tracker -> UAV : 5: flyByVelocityVector(trackingVector)
+  deactivate Tracker
+end
+
+MissionCommander -> UAV : 6: stopTracking()
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title SC3 – Generate Flight Routes for Area Coverage
+
+actor DroneCommander
+participant UIMaps
+participant AreaMappingService
+participant AreaMappingCreator
+participant RouteManagementService
+participant FlightRouteManager
+participant FlightManager
+participant UAV
+
+note over AreaMappingService, FlightManager
+  "DroneResponse" in the scenario text is realized here
+  by the architecture's service and core components.
+end note
+
+DroneCommander -> UIMaps : 1: selectMarkRegion()
+DroneCommander -> UIMaps : 2: markPolygon(polygon)
+activate UIMaps
+
+UIMaps -> AreaMappingService : 3: analyzePolygon(polygon)
+activate AreaMappingService
+AreaMappingService -> AreaMappingCreator : 3: checkFeasibility(polygon)
+AreaMappingCreator --> AreaMappingService : feasible
+AreaMappingService --> UIMaps : 3: polygonAccepted
+deactivate AreaMappingService
+
+DroneCommander -> UIMaps : 4: setNumberOfUAVs(n)
+
+UIMaps -> RouteManagementService : 5: generateRoutes(polygon, n)
+activate RouteManagementService
+RouteManagementService -> FlightRouteManager : 5: generateCoverageRoutes(polygon, n)
+activate FlightRouteManager
+FlightRouteManager -> FlightRouteManager : 5: optimizeCoverage()
+FlightRouteManager --> RouteManagementService : routes
+deactivate FlightRouteManager
+
+RouteManagementService -> FlightManager : 6: assignRoutes(routes)
+activate FlightManager
+loop for each of the N available UAVs
+  FlightManager -> UAV : 6: assignRoute(route)
+end
+FlightManager --> RouteManagementService : 7: routesAssigned
+deactivate FlightManager
+
+RouteManagementService --> UIMaps : 7: routesAssigned
+deactivate RouteManagementService
+deactivate UIMaps
+@enduml

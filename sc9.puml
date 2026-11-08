@@ -1,0 +1,34 @@
+@startuml
+participant UAV
+participant FlightManagementService
+participant UIUAVVideoFeed
+actor MissionCommander
+
+UAV -> UAV : 1: takeOff()
+UAV -> UAV : 1: flyToWaypoint()
+
+UAV -> FlightManagementService : 2: startVideoStream()
+
+FlightManagementService -> UIUAVVideoFeed : 3: displayVideoStream()
+
+UAV -> UAV : 4: determineSafeDropPoint()
+
+UAV -> UAV : 5: positionAt()
+
+UAV -> FlightManagementService : 6: requestDropPermission()
+FlightManagementService -> UIUAVVideoFeed : 6: showDropPermissionRequest()
+
+MissionCommander -> UIUAVVideoFeed : 7: grantDropPermission()
+UIUAVVideoFeed --> FlightManagementService : 7: permissionGranted
+FlightManagementService --> UAV : 7: permissionGranted
+
+UAV -> UAV : 8: lowerItem()
+
+UAV -> FlightManagementService : 9: reportItemLowered()
+FlightManagementService -> UIUAVVideoFeed : 9: showDropCompletionRequest()
+MissionCommander -> UIUAVVideoFeed : 9: confirmDropCompleted()
+UIUAVVideoFeed --> FlightManagementService : 9: dropConfirmed
+FlightManagementService --> UAV : 9: dropConfirmed
+
+UAV -> UAV : 10: moveTo()
+@enduml

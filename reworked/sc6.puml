@@ -1,0 +1,23 @@
+@startuml
+title SC6 – Flight Authorization
+
+actor RPIC
+participant UAV
+participant DroneResponse
+participant "airmap : Airmap\n<<AuthServiceProvider>>" as Airmap
+
+RPIC -> RPIC : 1: inspectUAV(uav)
+RPIC -> RPIC : 2: checkWeatherConditions()
+
+loop for each UAV in FAA controlled airspace
+  DroneResponse -> DroneResponse : 3: prepareAuthRequest()
+  activate DroneResponse
+  DroneResponse -> Airmap : 4: authRequest()
+  activate Airmap
+  Airmap --> DroneResponse : 5: permission
+  deactivate Airmap
+  DroneResponse -> DroneResponse : 6: markRestrictions()
+  DroneResponse -> DroneResponse : 7: establishGeoFence()
+  deactivate DroneResponse
+end
+@enduml

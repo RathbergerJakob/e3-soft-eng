@@ -1,0 +1,19 @@
+@startuml
+title SC1 – Activate and Arm
+
+actor RPIC
+participant UAV
+participant DroneResponse
+
+RPIC -> UAV : 1: deactivateSafetySwitch()
+
+DroneResponse -> UAV : 2: arm()
+activate UAV
+
+UAV -> UAV : 3–4: executeTests(PREARM)
+UAV -> UAV : 5: executeArm()
+UAV -> UAV : 6: setState(MISSION)
+
+UAV -> DroneResponse : 7: armedAndReady()
+deactivate UAV
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+actor MissionCommander
+participant UAV
+participant "UAV Onbaord Tracker" as Tracker
+
+UAV -> UAV: flyToWaypoint(tracking_position)
+
+loop until stopTracking is recived
+UAV -> Tracker: trackVictim()
+activate Tracker
+
+Tracker -> Tracker: calculateVictimPosition()
+Tracker -> Tracker: calculateVelocityVector()
+Tracker -> UAV: flyByVelocityVecotr(tracking_vector)
+deactivate Tracker
+
+end loop
+
+MissionCommander -> UAV: stopTracking()
+
+@enduml

@@ -1,0 +1,321 @@
+@startuml class-diagram
+title Dronology – Class Diagram (Team)
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+' Every message in sc1–sc10 is an operation on the RECEIVING class.
+' The ".. SCn .." separators show which scenario uses an operation.
+
+' ============================================================
+'  Actors / roles
+' ============================================================
+package "Actors" #FFFFFF {
+  class RPIC <<actor>> {
+    - name : String
+    .. SC6 ..
+    + inspectUAV(uav : UAV)
+    + checkWeatherConditions()
+  }
+  class MissionCommander <<actor>> {
+    - name : String
+  }
+  class DroneCommander <<actor>> {
+    - name : String
+  }
+}
+
+' ============================================================
+'  UI layer
+' ============================================================
+package "UI" #D5E8D4 {
+  class UIUAVControl {
+    .. SC5 ..
+    + callHome()
+  }
+
+  class UIUAVVideoFeed {
+    - activeStreamId : String
+    .. SC9 ..
+    + displayVideoStream()
+    + showDropPermissionRequest()
+    + grantDropPermission()
+    + showDropCompletionRequest()
+    + confirmDropCompleted()
+  }
+
+  class UIMaps {
+    - displayedRegion : Polygon
+    .. SC3 ..
+    + selectMarkRegion()
+    + markPolygon(polygon : Polygon)
+    + setNumberOfUAVs(n : int)
+  }
+
+  class UIRealTimeFlightView
+}
+
+' ============================================================
+'  Service layer
+' ============================================================
+package "Services" #FFF2CC {
+  class FlightManagementService {
+    .. SC9 ..
+    + startVideoStream()
+    + requestDropPermission()
+    + reportItemLowered()
+  }
+
+  class RouteManagementService {
+    .. SC3 ..
+    + generateRoutes(area : Polygon, n : int)
+  }
+
+  class AreaMappingService {
+    .. SC3 ..
+    + analyzePolygon(polygon : Polygon) : boolean
+  }
+
+  class RegistrationManagementService
+}
+
+' ============================================================
+'  Core layer
+' ============================================================
+package "Core" #DAE8FC {
+
+  enum UAVState {
+    INACTIVE
+    ARMING
+    MISSION
+    TRACKING
+    RETURNING_HOME
+    LANDED
+  }
+
+  enum TestType {
+    PREARM
+  }
+
+  class UAV {
+    - uavId : String
+    - state : UAVState
+    - position : Coordinate
+    - homeLocation : Coordinate
+    - altitude : double
+    - batteryLevel : double
+    - safetySwitchActive : boolean
+    .. SC1 Activate and Arm ..
+    + deactivateSafetySwitch()
+    + arm()
+    + executeTests(type : TestType)
+    + executeArm()
+    + setState(state : UAVState)
+    .. SC2 Active Tracking ..
+    + flyToWaypoint(waypoint : Coordinate)
+    + flyByVelocityVector(vector : VelocityVector)
+    + stopTracking()
+    .. SC3 Area Coverage ..
+    + assignRoute(route : FlightRoute)
+    .. SC4 Collect Sample ..
+    + positionForSampling()
+    + findUnobstructedRoute() : List<Coordinate>
+    .. SC5 End Flight ..
+    + requestHomeCoord() : Coordinate
+    + planHomeFlight()
+    + isHome() : boolean
+    + land()
+    .. SC7 Fly To Destination ..
+    + checkBatteryPower() : boolean
+    + ascendOrDescend(targetAltitude : double)
+    + isFinalDestReached() : boolean
+    + assumeAssignedTask()
+    .. SC9 Item Drop ..
+    + takeOff()
+    + determineSafeDropPoint() : Coordinate
+    + positionAt(point : Coordinate)
+    + lowerItem()
+    + moveTo(waypoint : Coordinate)
+    .. SC10 Lease Airspace ..
+    + calculateRequiredAirspace() : Airspace
+    + executeAction()
+  }
+
+  class UAVOnboardTracker {
+    - victimPosition : Coordinate
+    - velocityVector : VelocityVector
+    .. SC2 ..
+    + trackVictim()
+    + calculateVictimPosition() : Coordinate
+    + calculateVelocityVector() : VelocityVector
+  }
+
+  class Camera {
+    - active : boolean
+    .. SC8 ..
+    + isActive() : boolean
+    + activate()
+  }
+
+  class OnboardComputer {
+    - visionDetectionThreshold : double
+    .. SC8 ..
+    + streamImagery()
+    + processImagery()
+    + annotateObjects()
+  }
+
+  class CollectionDevice {
+    - remainingCapacity : int
+    - storedSamples : int
+    .. SC4 ..
+    + activate()
+    + lowerApparatus()
+    + collectSample()
+    + storeSample()
+    + hasCollectionResources() : boolean
+  }
+
+  class EventManager {
+    .. SC8 ..
+    + raiseAndForwardEvent(event : String)
+  }
+
+  class VideostreamServer {
+    .. SC8 ..
+    + transmitImageStreams(withAnnotations : boolean)
+  }
+
+  class FlightManager {
+    .. SC3 ..
+    + assignRoutes(routes : List<FlightRoute>)
+    .. SC5 ..
+    + raiseCompleteAlert()
+    + checkUniqueHome(home : Coordinate) : boolean
+  }
+
+  class FlightRouteManager {
+    .. SC3 ..
+    + generateCoverageRoutes(area : Polygon, n : int) : List<FlightRoute>
+    + optimizeCoverage()
+  }
+
+  class FlightRoute {
+    - routeId : String
+    - waypoints : List<Coordinate>
+  }
+
+  class AreaMappingCreator {
+    .. SC3 ..
+    + checkFeasibility(polygon : Polygon) : boolean
+  }
+
+  class FlightZoneManager {
+    - reservations : List<Airspace>
+    .. SC10 ..
+    + leaseAirspace(airspace : Airspace) : boolean
+    + checkAvailability(airspace : Airspace) : boolean
+    + reserveAirspace(airspace : Airspace)
+    + releasePreviousReservations(uavId : String)
+  }
+
+  class DroneResponse {
+    - flightPath : List<Coordinate>
+    - geoFence : List<Coordinate>
+    .. SC1 ..
+    + armedAndReady()
+    .. SC6 ..
+    + prepareAuthRequest()
+    + markRestrictions()
+    + establishGeoFence()
+    .. SC7 ..
+    + decomposePathIntoLegs()
+    + checkProhibitedAirspace(leg : FlightLeg, startingAltitude : double) : boolean
+    + reportArrival(waypoint : Coordinate)
+  }
+
+  class FlightLeg {
+    - startingAltitude : double
+    - targetWaypoint : Coordinate
+    .. SC7 ..
+    + FlightLeg(startingAltitude : double, targetWaypoint : Coordinate)
+    + setTargetWaypoint(waypoint : Coordinate)
+    + setStartingAltitude(altitude : double)
+  }
+
+  class UAVRegistrationManager
+  class RuntimeMonitoring
+}
+
+' ============================================================
+'  External systems
+' ============================================================
+package "External" #F5F5F5 {
+  interface AuthServiceProvider {
+    + authRequest() : Permission
+  }
+  class Airmap {
+    .. SC6 ..
+    + authRequest() : Permission
+  }
+  class TerrainMap {
+    .. SC7 ..
+    + checkTerrainAltitude(leg : FlightLeg, minSeparation : double) : boolean
+  }
+}
+
+' ============================================================
+'  Relationships
+' ============================================================
+
+' --- actors
+DroneCommander "1" --> "1" UIUAVControl : uses
+DroneCommander "1" --> "1" UIMaps : marks region on
+MissionCommander "1" --> "1" UIUAVVideoFeed : uses
+MissionCommander "0..1" -- "0..*" UAV : commands
+RPIC "0..1" -- "0..*" UAV : controls / inspects
+
+' --- UI -> Services / Core
+UIUAVControl "0..*" --> "1" FlightManager
+UIUAVVideoFeed "1..*" -- "1" FlightManagementService : displays streams of
+UIRealTimeFlightView "0..*" --> "1" FlightManagementService
+UIMaps "0..*" --> "1" AreaMappingService
+UIMaps "0..*" --> "1" RouteManagementService
+
+' --- Services -> Core
+FlightManagementService "1" --> "1" FlightManager
+RouteManagementService "1" --> "1" FlightRouteManager
+RouteManagementService "1" --> "1" FlightManager : hands routes to
+AreaMappingService "1" --> "1" AreaMappingCreator
+RegistrationManagementService "1" --> "1" UAVRegistrationManager
+UAV "0..*" --> "1" FlightManagementService : reports to
+
+' --- Core
+FlightManager "1" --> "0..*" UAV : manages
+UAVRegistrationManager "1" --> "0..*" UAV : registers
+RuntimeMonitoring "1" --> "0..*" UAV : monitors
+UAV "0..*" --> "1" FlightZoneManager : leases airspace from
+UAV --> UAVState
+UAV ..> TestType
+
+FlightRouteManager "1" --> "0..*" FlightRoute : generates
+UAV "0..1" --> "0..1" FlightRoute : assigned route
+
+UAV "1" *-- "1" UAVOnboardTracker
+UAV "1" *-- "1" Camera
+UAV "1" *-- "1" OnboardComputer
+UAV "1" *-- "0..1" CollectionDevice
+OnboardComputer "1" --> "1" EventManager : forwards events to
+OnboardComputer "1" --> "1" VideostreamServer : streams to
+
+DroneResponse "1" -- "0..*" UAV : arms / receives reports
+DroneResponse "1" *-- "0..*" FlightLeg : creates
+UAV "0..*" --> "0..1" FlightLeg : current leg
+
+' --- External
+DroneResponse "0..*" --> "1" AuthServiceProvider : requests authorization
+AuthServiceProvider <|.. Airmap
+DroneResponse "0..*" --> "1" TerrainMap : checks altitude
+
+@enduml

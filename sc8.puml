@@ -1,0 +1,25 @@
+@startuml
+autonumber
+
+participant UAV
+participant Camera
+participant "OnboardComputer" as Compute
+participant "EventManager" as EventMgr
+participant VideostreamServer
+
+UAV -> Camera: checkAndActivateCamera()
+
+loop Until UAV is commanded to stop collecting imagery
+    UAV -> Compute: streamImagery()
+    
+    Compute -> Compute: processImagery()
+    Compute -> Compute: annotateObjects()
+    
+    alt Object confidence > [VisionDetection_Threshold]
+        Compute -> EventMgr: raiseAndForwardEvent()
+    end
+    
+    Compute -> VideostreamServer: transmitImageStreams(with and without annotations)
+end
+
+@enduml

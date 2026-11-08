@@ -1,0 +1,29 @@
+@startuml
+title SC8 – Image Capture and Analysis
+
+participant UAV
+participant Camera
+participant OnboardComputer
+participant EventManager
+participant VideostreamServer
+
+UAV -> Camera : 1: isActive()
+Camera --> UAV : active
+opt camera not active
+  UAV -> Camera : 1: activate()
+end
+
+loop 6: until UAV is commanded to stop collecting imagery
+  UAV -> OnboardComputer : 2: streamImagery()
+  activate OnboardComputer
+  OnboardComputer -> OnboardComputer : 3: processImagery()
+  OnboardComputer -> OnboardComputer : 3: annotateObjects()
+
+  opt object confidence > VisionDetection_Threshold
+    OnboardComputer -> EventManager : 4: raiseAndForwardEvent(event)
+  end
+
+  OnboardComputer -> VideostreamServer : 5: transmitImageStreams(withAnnotations)
+  deactivate OnboardComputer
+end
+@enduml

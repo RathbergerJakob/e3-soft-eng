@@ -1,0 +1,20 @@
+@startuml
+participant UAV
+participant FlightZoneManager
+
+loop
+  UAV -> UAV : 1: calculateRequiredAirspace()
+
+  UAV -> FlightZoneManager : 2: leaseAirspace()
+
+  FlightZoneManager -> FlightZoneManager : 3: checkAvailability()
+
+  FlightZoneManager -> FlightZoneManager : 4: reserveAirspace()
+
+  FlightZoneManager -> FlightZoneManager : 5: releasePreviousReservations()
+
+  FlightZoneManager --> UAV : 6: leaseGranted
+
+  UAV -> UAV : 7: executeAction()
+end
+@enduml

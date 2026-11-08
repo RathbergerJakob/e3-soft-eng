@@ -1,0 +1,29 @@
+@startuml
+title SC5 – End Flight
+
+actor DroneCommander
+participant "UI UAV Control" as UIUAVControl
+participant FlightManager
+participant UAV
+participant FlightZoneManager
+
+DroneCommander -> UIUAVControl : 1: callHome()
+activate UIUAVControl
+UIUAVControl -> FlightManager : 1: raiseCompleteAlert()
+deactivate UIUAVControl
+activate FlightManager
+
+FlightManager -> UAV : 2: requestHomeCoord()
+UAV --> FlightManager : homeCoord
+FlightManager -> FlightManager : 2: checkUniqueHome(homeCoord)
+deactivate FlightManager
+
+UAV -> UAV : 3: planHomeFlight()
+
+loop 6: until isHome()
+  ref over UAV, FlightZoneManager : 4: SC10 Lease Airspace\n(next leg of the return route)
+  UAV -> UAV : 5: flyToWaypoint(nextWaypoint)
+end
+
+UAV -> UAV : 6: land()
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+autonumber
+
+participant DroneResponse
+participant "leg:FlightLeg" as FlightLeg
+participant UAV
+participant TerrainMap
+
+DroneResponse -> DroneResponse: decomposePathIntoLegs()
+
+loop For each flight leg
+    DroneResponse -> FlightLeg **: create(starting_altitude, target_waypoint)
+    
+    DroneResponse -> DroneResponse: checkProhibitedAirspace(leg, starting_altitude)
+    
+    DroneResponse -> TerrainMap: checkTerrainAltitude(leg, minimum_terrain_separation)
+end
+
+loop Until final destination is reached
+    UAV -> UAV: checkBatteryPower()
+    
+    UAV -> UAV: leaseAirspace(current_leg)
+    
+    UAV -> UAV: ascendOrDescend(target_altitude)
+    UAV -> UAV: flyToWaypoint(destination_waypoint)
+    
+    UAV -> DroneResponse: reportArrival(waypoint)
+end
+
+UAV -> UAV: assumeAssignedTask()
+
+@enduml

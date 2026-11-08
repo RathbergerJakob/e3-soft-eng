@@ -1,0 +1,26 @@
+@startuml
+actor RPIC
+actor UAV
+participant Airmap
+participant DroneResponse
+actor AuthServiceProvider
+
+activate RPIC
+activate UAV
+activate AuthServiceProvider
+
+RPIC -> UAV : 1: inspects
+RPIC -> RPIC : 2: check conditions
+
+DroneResponse -> DroneResponse : 3: prepareAuthRequest()
+activate DroneResponse
+DroneResponse -> AuthServiceProvider : 4: authRequest()
+
+activate Airmap
+Airmap -> DroneResponse : 5: returnPermission()
+deactivate Airmap
+
+DroneResponse -> DroneResponse : 6: markRestrictions()
+DroneResponse -> DroneResponse : 7: establishGeoFence()
+deactivate DroneResponse
+@enduml

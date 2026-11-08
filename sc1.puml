@@ -1,0 +1,16 @@
+@startuml
+actor RPIC
+participant UAV
+participant DroneResponse
+
+RPIC -> UAV: deactivateSafetySwitch()
+
+activate UAV
+DroneResponse -> UAV: arm()
+
+UAV -> UAV: executeTests(Prearm)
+UAV -> UAV: executeArm()
+UAV -> UAV: setStatus(MISSION)
+
+UAV -> DroneResponse: armedAndReady()
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+title SC9 – Item Drop
+
+participant UAV
+participant FlightManagementService
+participant UIUAVVideoFeed
+actor MissionCommander
+
+UAV -> UAV : 1: takeOff()
+ref over UAV : 1: SC7 Fly to Destination\n(designated delivery coordinates)
+
+UAV -> FlightManagementService : 2: startVideoStream()
+FlightManagementService -> UIUAVVideoFeed : 3: displayVideoStream()
+
+ref over UAV : 4: SC8 Image Capture and Analysis
+UAV -> UAV : 4: determineSafeDropPoint()
+UAV -> UAV : 5: positionAt(dropPoint)
+
+UAV -> FlightManagementService : 6: requestDropPermission()
+FlightManagementService -> UIUAVVideoFeed : 6: showDropPermissionRequest()
+MissionCommander -> UIUAVVideoFeed : 7: grantDropPermission()
+UIUAVVideoFeed --> FlightManagementService : 7: permissionGranted
+FlightManagementService --> UAV : 7: permissionGranted
+
+UAV -> UAV : 8: lowerItem()
+
+UAV -> FlightManagementService : 9: reportItemLowered()
+FlightManagementService -> UIUAVVideoFeed : 9: showDropCompletionRequest()
+MissionCommander -> UIUAVVideoFeed : 9: confirmDropCompleted()
+UIUAVVideoFeed --> FlightManagementService : 9: dropConfirmed
+FlightManagementService --> UAV : 9: dropConfirmed
+
+UAV -> UAV : 10: moveTo(safeObservationPoint)
+@enduml

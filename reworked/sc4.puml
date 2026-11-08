@@ -1,0 +1,27 @@
+@startuml
+title SC4 – Collect Environmental Sample
+
+participant UAV
+participant CollectionDevice
+
+loop 4: until all collection points visited or not hasCollectionResources()
+  ref over UAV : 1: SC7 Fly to Destination\n(designated collection coordinates)
+
+  UAV -> UAV : 2: positionForSampling()
+  ref over UAV : 2.1–2.2: SC8 Image Capture and Analysis
+  UAV -> UAV : 2.1: findUnobstructedRoute()
+  UAV -> UAV : 2.2: ascendOrDescend(samplingAltitude)
+
+  UAV -> CollectionDevice : 3: activate()
+  activate CollectionDevice
+  UAV -> CollectionDevice : 3.1: lowerApparatus()
+  UAV -> CollectionDevice : 3.2: collectSample()
+  UAV -> CollectionDevice : 3.3: storeSample()
+  UAV -> CollectionDevice : 4: hasCollectionResources()
+  CollectionDevice --> UAV : resourcesLeft
+  deactivate CollectionDevice
+end
+
+UAV -> UAV : 5: planHomeFlight()
+ref over UAV : 5: continue as SC5 End Flight (steps 3–6)
+@enduml
