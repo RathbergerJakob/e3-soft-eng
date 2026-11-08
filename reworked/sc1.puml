@@ -14,6 +14,6 @@ UAV -> UAV : 3–4: executeTests(PREARM)
 UAV -> UAV : 5: executeArm()
 UAV -> UAV : 6: setState(MISSION)
 
-UAV -> DroneResponse : 7: armedAndReady()
+UAV --> DroneResponse : 7: armedAndReady
 deactivate UAV
 @enduml

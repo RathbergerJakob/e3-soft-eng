@@ -37,6 +37,9 @@ package "UI" #D5E8D4 {
 
   class UIUAVVideoFeed {
     - activeStreamId : String
+    .. SC11 (template) ..
+    + confirmsVictim()
+    + raiseVictimFoundAlert()
     .. SC9 ..
     + displayVideoStream()
     + showDropPermissionRequest()
@@ -61,6 +64,8 @@ package "UI" #D5E8D4 {
 ' ============================================================
 package "Services" #FFF2CC {
   class FlightManagementService {
+    .. SC11 (template) ..
+    + victimFoundAlert()
     .. SC9 ..
     + startVideoStream()
     + requestDropPermission()
@@ -108,11 +113,12 @@ package "Core" #DAE8FC {
     - safetySwitchActive : boolean
     .. SC1 Activate and Arm ..
     + deactivateSafetySwitch()
-    + arm()
+    + arm() : boolean
     + executeTests(type : TestType)
     + executeArm()
     + setState(state : UAVState)
     .. SC2 Active Tracking ..
+    + positionAt(point : Coordinate)
     + flyToWaypoint(waypoint : Coordinate)
     + flyByVelocityVector(vector : VelocityVector)
     + stopTracking()
@@ -134,7 +140,6 @@ package "Core" #DAE8FC {
     .. SC9 Item Drop ..
     + takeOff()
     + determineSafeDropPoint() : Coordinate
-    + positionAt(point : Coordinate)
     + lowerItem()
     + moveTo(waypoint : Coordinate)
     .. SC10 Lease Airspace ..
@@ -223,8 +228,6 @@ package "Core" #DAE8FC {
   class DroneResponse {
     - flightPath : List<Coordinate>
     - geoFence : List<Coordinate>
-    .. SC1 ..
-    + armedAndReady()
     .. SC6 ..
     + prepareAuthRequest()
     + markRestrictions()
