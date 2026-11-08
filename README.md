@@ -10,7 +10,7 @@ UML models for exercise E3, written in PlantUML.
 | `scN.puml`, `sc5.png`, `sc6.png` | Original sequence diagrams as handed in by each member |
 | `reworked/class-diagram.puml` | Reworked class diagram, consistent with all sequence diagrams |
 | `reworked/scN.puml` | Reworked sequence diagrams SC1–SC10. Messages are labelled with the dataset step numbers. A message marked `«SCn»` calls another scenario |
-| `reworked/notes` | Open review notes / TODOs |
+| `reworked/state-machine.puml` | UAV state machine, tied to SC1 Activate and Arm |
 
 ## Scenario owners
 

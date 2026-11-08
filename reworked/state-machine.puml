@@ -1,0 +1,15 @@
+@startuml
+title UAV – State Machine (SC1 Activate and Arm)
+
+hide empty description
+
+[*] --> INACTIVE
+
+INACTIVE --> INACTIVE : 1: deactivateSafetySwitch()\n/ safetySwitchActive = false
+INACTIVE --> ARMING : 2: arm() [not safetySwitchActive]
+
+ARMING : entry / executeTests(PREARM)
+ARMING --> MISSION : [tests passed]\n/ executeArm(); setState(MISSION)
+ARMING --> INACTIVE : [tests failed]
+
+@enduml
