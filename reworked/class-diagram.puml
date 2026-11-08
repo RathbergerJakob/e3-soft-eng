@@ -7,6 +7,8 @@ hide empty members
 
 ' Every message in sc1–sc10 is an operation on the RECEIVING class.
 ' The ".. SCn .." separators show which scenario uses an operation.
+' Scenario calls: a message marked «SCn» calls the operation that scN
+' starts with (its incoming [-> message).
 
 ' ============================================================
 '  Actors / roles
@@ -142,9 +144,11 @@ package "Core" #DAE8FC {
     + determineSafeDropPoint() : Coordinate
     + lowerItem()
     + moveTo(waypoint : Coordinate)
+    .. SC8 Image Capture (entry) ..
+    + captureAndAnalyzeImagery()
     .. SC10 Lease Airspace ..
+    + triggerLease()
     + calculateRequiredAirspace() : Airspace
-    + executeAction()
   }
 
   class UAVOnboardTracker {
@@ -233,6 +237,7 @@ package "Core" #DAE8FC {
     + markRestrictions()
     + establishGeoFence()
     .. SC7 ..
+    + requestFlightTo(destination : Coordinate)
     + decomposePathIntoLegs()
     + checkProhibitedAirspace(leg : FlightLeg, startingAltitude : double) : boolean
     + reportArrival(waypoint : Coordinate)

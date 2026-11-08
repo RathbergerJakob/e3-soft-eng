@@ -5,7 +5,6 @@ actor DroneCommander
 participant "UI UAV Control" as UIUAVControl
 participant FlightManager
 participant UAV
-participant FlightZoneManager
 
 DroneCommander -> UIUAVControl : 1: callHome()
 activate UIUAVControl
@@ -21,7 +20,7 @@ deactivate FlightManager
 UAV -> UAV : 3: planHomeFlight()
 
 loop 6: until isHome()
-  ref over UAV, FlightZoneManager : 4: SC10 Lease Airspace\n(next leg of the return route)
+  UAV -> UAV : 4: triggerLease() «SC10»
   UAV -> UAV : 5: flyToWaypoint(nextWaypoint)
 end
 

@@ -8,7 +8,7 @@ participant "UAV Onboard Tracker" as Tracker
 UAV -> UAV : 1: positionAt(trackingPosition)
 
 loop 6: until stopTracking() is received
-  ref over UAV : 2: SC8 Image Capture and Analysis\n(continually tag the victim)
+  UAV -> UAV : 2: captureAndAnalyzeImagery() «SC8»
 
   UAV -> Tracker : trackVictim()
   activate Tracker

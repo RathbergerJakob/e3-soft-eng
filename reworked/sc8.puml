@@ -7,6 +7,9 @@ participant OnboardComputer
 participant EventManager
 participant VideostreamServer
 
+[-> UAV : captureAndAnalyzeImagery()
+activate UAV
+
 UAV -> Camera : 1: isActive()
 Camera --> UAV : active
 opt camera not active
@@ -26,4 +29,5 @@ loop 6: until UAV is commanded to stop collecting imagery
   OnboardComputer -> VideostreamServer : 5: transmitImageStreams(withAnnotations)
   deactivate OnboardComputer
 end
+deactivate UAV
 @enduml

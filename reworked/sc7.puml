@@ -5,7 +5,9 @@ participant DroneResponse
 participant "leg : FlightLeg" as FlightLeg
 participant TerrainMap
 participant UAV
-participant FlightZoneManager
+
+[-> DroneResponse : requestFlightTo(destination)
+activate DroneResponse
 
 DroneResponse -> DroneResponse : 1: decomposePathIntoLegs()
 
@@ -14,10 +16,11 @@ loop 5: for each flight leg
   DroneResponse -> DroneResponse : 3: checkProhibitedAirspace(leg, startingAltitude)
   DroneResponse -> TerrainMap : 4: checkTerrainAltitude(leg, minimumTerrainSeparation)
 end
+deactivate DroneResponse
 
 loop 11: until isFinalDestReached()
   UAV -> UAV : 6: checkBatteryPower()
-  ref over UAV, FlightZoneManager : 7: SC10 Lease Airspace\n(current flight leg)
+  UAV -> UAV : 7: triggerLease() «SC10»
   UAV -> UAV : 8: ascendOrDescend(targetAltitude)
   UAV -> UAV : 9: flyToWaypoint(destinationWaypoint)
   UAV -> DroneResponse : 10: reportArrival(waypoint)

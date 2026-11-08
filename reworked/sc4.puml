@@ -2,13 +2,14 @@
 title SC4 – Collect Environmental Sample
 
 participant UAV
+participant DroneResponse
 participant CollectionDevice
 
 loop 4: until all collection points visited or not hasCollectionResources()
-  ref over UAV : 1: SC7 Fly to Destination\n(designated collection coordinates)
+  UAV -> DroneResponse : 1: requestFlightTo(collectionPoint) «SC7»
 
   UAV -> UAV : 2: positionForSampling()
-  ref over UAV : 2.1–2.2: SC8 Image Capture and Analysis
+  UAV -> UAV : 2.1–2.2: captureAndAnalyzeImagery() «SC8»
   UAV -> UAV : 2.1: findUnobstructedRoute()
   UAV -> UAV : 2.2: ascendOrDescend(samplingAltitude)
 
@@ -23,5 +24,4 @@ loop 4: until all collection points visited or not hasCollectionResources()
 end
 
 UAV -> UAV : 5: planHomeFlight()
-ref over UAV : 5: continue as SC5 End Flight (steps 3–6)
 @enduml

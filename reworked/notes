@@ -1,6 +1,2 @@
 sc5
 step 4-6 could be replaced completly by sc7
-
-
-generally
-make methods instead of ref for each use case, so we can display it better

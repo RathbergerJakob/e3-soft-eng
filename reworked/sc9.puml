@@ -2,17 +2,18 @@
 title SC9 – Item Drop
 
 participant UAV
+participant DroneResponse
 participant FlightManagementService
 participant UIUAVVideoFeed
 actor MissionCommander
 
 UAV -> UAV : 1: takeOff()
-ref over UAV : 1: SC7 Fly to Destination\n(designated delivery coordinates)
+UAV -> DroneResponse : 1: requestFlightTo(deliveryCoordinates) «SC7»
 
 UAV -> FlightManagementService : 2: startVideoStream()
 FlightManagementService -> UIUAVVideoFeed : 3: displayVideoStream()
 
-ref over UAV : 4: SC8 Image Capture and Analysis
+UAV -> UAV : 4: captureAndAnalyzeImagery() «SC8»
 UAV -> UAV : 4: determineSafeDropPoint()
 UAV -> UAV : 5: positionAt(dropPoint)
 

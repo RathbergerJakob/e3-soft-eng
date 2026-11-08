@@ -9,7 +9,7 @@ UML models for exercise E3, written in PlantUML.
 | `class-diagramm.xml` | Original team class diagram (diagrams.net export) |
 | `scN.puml`, `sc5.png`, `sc6.png` | Original sequence diagrams as handed in by each member |
 | `reworked/class-diagram.puml` | Reworked class diagram, consistent with all sequence diagrams |
-| `reworked/scN.puml` | Reworked sequence diagrams SC1–SC10. Messages are labelled with the dataset step numbers, and `ref` boxes mark where one scenario includes another |
+| `reworked/scN.puml` | Reworked sequence diagrams SC1–SC10. Messages are labelled with the dataset step numbers. A message marked `«SCn»` calls another scenario |
 | `reworked/notes` | Open review notes / TODOs |
 
 ## Scenario owners
@@ -26,6 +26,12 @@ UML models for exercise E3, written in PlantUML.
 
 Every message in a `reworked/scN.puml` must exist as an operation on the **receiving** class in `reworked/class-diagram.puml`.
 
-## Scenario references (`ref`)
+## Scenario calls
 
-SC2→SC8, SC4→SC7, SC4→SC8, SC4→SC5, SC5→SC10, SC7→SC10, SC9→SC7, SC9→SC8
+When one scenario includes another, it calls a method instead of drawing a `ref` box. The called diagram starts with that same method as an incoming message (`[-> Class : method()`), and the call is marked `«SCn»`.
+
+| Called scenario | Method | Called from |
+|---|---|---|
+| SC7 Fly to Destination | `DroneResponse.requestFlightTo(destination)` | SC4 step 1, SC9 step 1 |
+| SC8 Image Capture | `UAV.captureAndAnalyzeImagery()` | SC2 step 2, SC4 steps 2.1–2.2, SC9 step 4 |
+| SC10 Lease Airspace | `UAV.triggerLease()` | SC5 step 4, SC7 step 7 |

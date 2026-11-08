@@ -4,22 +4,23 @@ title SC10 – Lease Airspace for Planned Flight Path
 participant UAV
 participant "FlightZoneManager\n(ATC)" as FlightZoneManager
 
+[-> UAV : triggerLease()
+activate UAV
+
+UAV -> UAV : 1: calculateRequiredAirspace()
+
+UAV -> FlightZoneManager : 2: leaseAirspace(airspace)
+activate FlightZoneManager
+FlightZoneManager -> FlightZoneManager : 3: checkAvailability(airspace)
+FlightZoneManager -> FlightZoneManager : 4: reserveAirspace(airspace)
+FlightZoneManager -> FlightZoneManager : 5: releasePreviousReservations(uavId)
+FlightZoneManager --> UAV : 6: leaseGranted
+deactivate FlightZoneManager
+deactivate UAV
+
 note over UAV, FlightZoneManager
-  Referenced by SC5 (step 4) and SC7 (step 7).
-  Each reference stands for one pass of this loop.
+  7: The UAV completes its action (e.g. flyToWaypoint() in SC5 / SC7)
+  and calls triggerLease() again for the next one.
+  Called by SC5 step 4 and SC7 step 7.
 end note
-
-loop 7: for each next action of the UAV
-  UAV -> UAV : 1: calculateRequiredAirspace()
-
-  UAV -> FlightZoneManager : 2: leaseAirspace(airspace)
-  activate FlightZoneManager
-  FlightZoneManager -> FlightZoneManager : 3: checkAvailability(airspace)
-  FlightZoneManager -> FlightZoneManager : 4: reserveAirspace(airspace)
-  FlightZoneManager -> FlightZoneManager : 5: releasePreviousReservations(uavId)
-  FlightZoneManager --> UAV : 6: leaseGranted
-  deactivate FlightZoneManager
-
-  UAV -> UAV : 7: executeAction()
-end
 @enduml
