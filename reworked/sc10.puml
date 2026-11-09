@@ -17,10 +17,4 @@ FlightZoneManager -> FlightZoneManager : 5: releasePreviousReservations(uavId)
 FlightZoneManager --> UAV : 6: leaseGranted
 deactivate FlightZoneManager
 deactivate UAV
-
-note over UAV, FlightZoneManager
-  7: The UAV completes its action (e.g. flyToWaypoint() in SC5 / SC7)
-  and calls triggerLease() again for the next one.
-  Called by SC5 step 4 and SC7 step 7.
-end note
 @enduml
